@@ -1,1 +1,5 @@
 .history
+cves/2025/index.json
+cves.db
+node_modules
+cves

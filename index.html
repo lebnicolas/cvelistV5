@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigateur CVE 2025</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🔒 Navigateur CVE 2025</h1>
+            <p class="subtitle">Parcourir les Common Vulnerabilities and Exposures de l'année 2025</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Barre de recherche et filtres -->
+        <section class="search-section">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Rechercher par ID CVE ou titre..." autocomplete="off">
+                <button id="searchBtn" aria-label="Rechercher">🔍</button>
+            </div>
+
+            <!-- Zone des filtres actifs -->
+            <div id="activeFilters" class="active-filters" style="display: none;">
+                <span class="active-filters-label">Filtres actifs:</span>
+                <div class="filter-badges" id="filterBadges">
+                    <!-- Les badges seront générés dynamiquement -->
+                </div>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="severityFilter">Sévérité:</label>
+                    <select id="severityFilter">
+                        <option value="">Toutes</option>
+                        <option value="CRITICAL">Critique</option>
+                        <option value="HIGH">Élevée</option>
+                        <option value="MEDIUM">Moyenne</option>
+                        <option value="LOW">Faible</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="stateFilter">État:</label>
+                    <select id="stateFilter">
+                        <option value="">Tous</option>
+                        <option value="PUBLISHED">Publié</option>
+                        <option value="RESERVED">Réservé</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="cvssMinFilter">CVSS Min:</label>
+                    <input type="number" id="cvssMinFilter" min="0" max="10" step="0.1" placeholder="0.0">
+                </div>
+
+                <div class="filter-group">
+                    <label for="cvssMaxFilter">CVSS Max:</label>
+                    <input type="number" id="cvssMaxFilter" min="0" max="10" step="0.1" placeholder="10.0">
+                </div>
+
+                <div class="filter-group">
+                    <label for="sortBy">Trier par:</label>
+                    <select id="sortBy">
+                        <option value="dateDesc">Date (récent)</option>
+                        <option value="dateAsc">Date (ancien)</option>
+                        <option value="cvssDesc">CVSS (haut)</option>
+                        <option value="cvssAsc">CVSS (bas)</option>
+                        <option value="idAsc">ID (croissant)</option>
+                        <option value="idDesc">ID (décroissant)</option>
+                    </select>
+                </div>
+
+                <button id="clearFilters" class="btn-secondary">Effacer les filtres</button>
+            </div>
+        </section>
+
+        <!-- Statistiques -->
+        <section class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Total CVE:</span>
+                <span class="stat-value" id="totalCVE">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Affichés:</span>
+                <span class="stat-value" id="displayedCVE">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Chargement:</span>
+                <span class="stat-value" id="loadingStatus">En attente...</span>
+            </div>
+            <div class="stat-item">
+                <button id="refreshBtn" class="btn-refresh" title="Forcer le rechargement complet depuis les fichiers">🔄 Actualiser</button>
+            </div>
+        </section>
+
+        <!-- Liste des CVE -->
+        <section class="cve-list-section">
+            <div id="cveList" class="cve-list">
+                <div class="loading-message">Chargement des CVE...</div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination">
+                <!-- Générée dynamiquement -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de détails CVE -->
+    <div id="cveModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <div id="cveDetails">
+                <!-- Contenu généré dynamiquement -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/db.js"></script>
+    <script src="js/cveLoader.js"></script>
+    <script src="js/cveRenderer.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+

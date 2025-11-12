@@ -1,0 +1,21 @@
+{
+  "name": "cve-navigator",
+  "version": "1.0.0",
+  "description": "Navigateur CVE 2025 avec base de données SQLite",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "import": "node import-to-sqlite.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "cve",
+    "security",
+    "vulnerability"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^11.10.0"
+  }
+}

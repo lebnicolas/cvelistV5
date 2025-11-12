@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réinitialisation du cache CVE</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            margin-top: 0;
+        }
+        button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+        button:hover {
+            background: #b91c1c;
+        }
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+        }
+        .success {
+            background: #f0fdf4;
+            border-left-color: #16a34a;
+            color: #15803d;
+        }
+        .error {
+            background: #fef2f2;
+            border-left-color: #dc2626;
+            color: #991b1b;
+        }
+        .info {
+            background: #fef9c3;
+            border-left-color: #eab308;
+            color: #854d0e;
+            margin-top: 20px;
+        }
+        a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Réinitialisation du cache</h1>
+        <p>Cette page supprime toutes les données en cache (IndexedDB) pour forcer un rechargement complet de toutes les CVE.</p>
+        
+        <div class="info">
+            <strong>⚠️ Attention :</strong> Cette action supprimera toutes les CVE stockées localement. Le prochain chargement prendra plus de temps car il devra recharger toutes les CVE depuis les fichiers.
+        </div>
+        
+        <button id="clearBtn" onclick="clearAllCache()">
+            Vider le cache et réinitialiser
+        </button>
+        
+        <div id="status"></div>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="index.html">← Retour à l'application</a>
+        </div>
+    </div>
+
+    <script>
+        async function clearAllCache() {
+            const btn = document.getElementById('clearBtn');
+            const status = document.getElementById('status');
+            
+            btn.disabled = true;
+            btn.textContent = 'Suppression en cours...';
+            status.innerHTML = '<div class="status">Suppression des données en cache...</div>';
+            
+            try {
+                // Supprimer IndexedDB
+                const deleteRequest = indexedDB.deleteDatabase('CVEDatabase');
+                
+                deleteRequest.onsuccess = function() {
+                    console.log('IndexedDB supprimée avec succès');
+                    
+                    // Vider le cache du navigateur
+                    if ('caches' in window) {
+                        caches.keys().then(names => {
+                            names.forEach(name => {
+                                caches.delete(name);
+                            });
+                        });
+                    }
+                    
+                    status.innerHTML = `
+                        <div class="status success">
+                            <strong>✓ Cache vidé avec succès !</strong><br><br>
+                            Les actions suivantes ont été effectuées :<br>
+                            • IndexedDB supprimée<br>
+                            • Cache navigateur vidé<br><br>
+                            <a href="index.html" style="color: #15803d; font-weight: bold;">→ Recharger l'application maintenant</a>
+                        </div>
+                    `;
+                    
+                    btn.textContent = 'Cache vidé !';
+                };
+                
+                deleteRequest.onerror = function() {
+                    throw new Error('Erreur lors de la suppression de IndexedDB');
+                };
+                
+                deleteRequest.onblocked = function() {
+                    status.innerHTML = `
+                        <div class="status error">
+                            <strong>⚠️ Action bloquée</strong><br><br>
+                            Veuillez fermer tous les autres onglets de l'application CVE, puis réessayez.
+                        </div>
+                    `;
+                    btn.disabled = false;
+                    btn.textContent = 'Réessayer';
+                };
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                status.innerHTML = `
+                    <div class="status error">
+                        <strong>✗ Erreur</strong><br><br>
+                        ${error.message}
+                    </div>
+                `;
+                btn.disabled = false;
+                btn.textContent = 'Réessayer';
+            }
+        }
+        
+        // Afficher les informations sur le cache actuel
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const request = indexedDB.open('CVEDatabase');
+                request.onsuccess = function(event) {
+                    const db = event.target.result;
+                    const transaction = db.transaction(['cves'], 'readonly');
+                    const store = transaction.objectStore('cves');
+                    const countRequest = store.count();
+                    
+                    countRequest.onsuccess = function() {
+                        const count = countRequest.result;
+                        if (count > 0) {
+                            document.getElementById('status').innerHTML = `
+                                <div class="status">
+                                    <strong>État actuel du cache:</strong><br>
+                                    ${count} CVE stockées dans IndexedDB
+                                </div>
+                            `;
+                        }
+                    };
+                    
+                    db.close();
+                };
+                
+                request.onerror = function() {
+                    // Pas de base de données existante
+                    document.getElementById('status').innerHTML = `
+                        <div class="status">
+                            <strong>État actuel:</strong><br>
+                            Aucune donnée en cache
+                        </div>
+                    `;
+                };
+            } catch (error) {
+                console.error('Erreur lors de la lecture du cache:', error);
+            }
+        });
+    </script>
+</body>
+</html>
+
