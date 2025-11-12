@@ -13,6 +13,7 @@ const PORT = process.argv[2] || 8080;
 const CVES_DIR = path.join(__dirname, 'cves', '2025');
 const INDEX_FILE = path.join(__dirname, 'cves', '2025', 'index.json');
 const DB_PATH = path.join(__dirname, 'cves.db');
+const PREDEFINED_FILTERS_FILE = path.join(__dirname, 'data', 'predefined-filters.json');
 
 let db = null;
 
@@ -189,6 +190,77 @@ function handleAPI(req, res, parsedUrl) {
     const pathname = parsedUrl.pathname;
     const query = parsedUrl.query;
     
+    console.log(`[API] ${req.method} ${pathname}`);
+    
+    // GET /api/predefined-filters - Récupérer les filtres prédéfinis
+    if (pathname === '/api/predefined-filters' && req.method === 'GET') {
+        try {
+            if (fs.existsSync(PREDEFINED_FILTERS_FILE)) {
+                const content = fs.readFileSync(PREDEFINED_FILTERS_FILE, 'utf8');
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(content);
+            } else {
+                // Créer le fichier avec les valeurs par défaut
+                const defaultFilters = { filters: ['Dell', 'vCenter', 'ESXi'] };
+                fs.writeFileSync(PREDEFINED_FILTERS_FILE, JSON.stringify(defaultFilters, null, 2), 'utf8');
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(defaultFilters));
+            }
+        } catch (error) {
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: error.message }));
+        }
+        return;
+    }
+    
+    // POST /api/predefined-filters - Sauvegarder les filtres prédéfinis
+    if (pathname === '/api/predefined-filters' && req.method === 'POST') {
+        console.log('POST /api/predefined-filters reçu');
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', () => {
+            console.log('Body reçu:', body);
+            try {
+                if (!body) {
+                    throw new Error('Body vide');
+                }
+                
+                const data = JSON.parse(body);
+                
+                // Valider la structure
+                if (!data || !Array.isArray(data.filters)) {
+                    throw new Error('Format invalide: data.filters doit être un tableau');
+                }
+                
+                // Créer le dossier data s'il n'existe pas
+                const dataDir = path.dirname(PREDEFINED_FILTERS_FILE);
+                if (!fs.existsSync(dataDir)) {
+                    fs.mkdirSync(dataDir, { recursive: true });
+                }
+                
+                // Sauvegarder le fichier
+                fs.writeFileSync(PREDEFINED_FILTERS_FILE, JSON.stringify(data, null, 2), 'utf8');
+                console.log(`Filtres prédéfinis sauvegardés: ${data.filters.length} filtres`);
+                
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: true }));
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde des filtres prédéfinis:', error);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: error.message }));
+            }
+        });
+        req.on('error', (error) => {
+            console.error('Erreur lors de la lecture de la requête:', error);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Erreur lors de la lecture de la requête' }));
+        });
+        return;
+    }
+    
+    // Les endpoints suivants nécessitent la base de données
     if (!db) {
         res.writeHead(503, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Base de données non disponible' }));
@@ -379,7 +451,7 @@ function startServer() {
         
         // CORS headers
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         
         if (req.method === 'OPTIONS') {

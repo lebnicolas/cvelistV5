@@ -2,4 +2,5 @@
 cves/2025/index.json
 cves.db
 node_modules
+data/predefined-filters.json
 cves

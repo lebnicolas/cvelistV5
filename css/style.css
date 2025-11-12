@@ -35,6 +35,20 @@ body {
     padding: 0 20px;
 }
 
+/* Layout principal avec sidebar */
+.main-wrapper {
+    display: flex;
+    gap: 1.5rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.main-content {
+    flex: 1;
+    min-width: 0; /* Permet au contenu de se rétrécir */
+}
+
 /* Header */
 header {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
@@ -531,10 +545,147 @@ header h1 {
     border: 1px solid var(--border-color);
 }
 
+.active-filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
 .active-filters-label {
     font-size: 0.875rem;
     color: var(--text-secondary);
-    margin-right: 0.75rem;
+}
+
+.search-mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    user-select: none;
+}
+
+.search-mode-toggle input[type="checkbox"] {
+    cursor: pointer;
+    width: 1.125rem;
+    height: 1.125rem;
+    accent-color: var(--primary-color);
+}
+
+.search-mode-label {
+    color: var(--text-color);
+}
+
+/* Sidebar des filtres prédéfinis */
+.sidebar {
+    width: 250px;
+    min-width: 250px;
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    height: fit-content;
+    position: sticky;
+    top: 1rem;
+}
+
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.btn-add-filter {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    border: 2px solid var(--primary-color);
+    background: var(--primary-color);
+    color: white;
+    font-size: 1.25rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+    padding: 0;
+}
+
+.btn-add-filter:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: scale(1.1);
+}
+
+.predefined-filters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.predefined-filter-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.predefined-filter-btn {
+    flex: 1;
+    padding: 0.625rem 1rem;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.predefined-filter-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+.remove-filter-btn {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+    padding: 0;
+}
+
+.remove-filter-btn:hover {
+    background: var(--danger-color);
+    color: white;
+    border-color: var(--danger-color);
 }
 
 .filter-badges {
@@ -584,6 +735,21 @@ header h1 {
 @media (max-width: 768px) {
     header h1 {
         font-size: 1.75rem;
+    }
+    
+    .main-wrapper {
+        flex-direction: column;
+        padding: 0 10px;
+    }
+    
+    .sidebar {
+        width: 100%;
+        min-width: unset;
+        position: static;
+    }
+    
+    .sidebar-header {
+        flex-wrap: wrap;
     }
 
     .filters {

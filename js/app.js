@@ -20,6 +20,7 @@ const APP = {
         cvssMin: [],
         cvssMax: []
     },
+    searchMode: 'AND', // 'AND' ou 'OR' pour les filtres de recherche
     currentSort: 'dateDesc',
     isLoading: false,
     
@@ -80,6 +81,15 @@ const APP = {
         searchBtn.addEventListener('click', () => {
             applySearch();
         });
+        
+        // Case à cocher pour basculer entre ET/OU
+        const searchModeCheckbox = document.getElementById('searchModeCheckbox');
+        if (searchModeCheckbox) {
+            searchModeCheckbox.addEventListener('change', (e) => {
+                this.searchMode = e.target.checked ? 'OR' : 'AND';
+                this.applyFilters();
+            });
+        }
         
         // Filtres
         document.getElementById('severityFilter').addEventListener('change', (e) => {
@@ -295,9 +305,29 @@ const APP = {
         
         // Appliquer les filtres de recherche texte (peut y en avoir plusieurs)
         if (this.activeFilters.search.length > 0) {
-            this.activeFilters.search.forEach(filter => {
-                filtered = searchCVEs(filtered, filter.value);
-            });
+            if (this.searchMode === 'OR') {
+                // Mode OU : les CVE doivent correspondre à AU MOINS UN des filtres
+                const matchingCVEs = new Set();
+                this.activeFilters.search.forEach(filter => {
+                    const results = searchCVEs(this.allCVEs, filter.value);
+                    results.forEach(cve => {
+                        const cveId = cve.cveMetadata?.cveId;
+                        if (cveId) {
+                            matchingCVEs.add(cveId);
+                        }
+                    });
+                });
+                // Filtrer pour ne garder que les CVE qui correspondent
+                filtered = filtered.filter(cve => {
+                    const cveId = cve.cveMetadata?.cveId;
+                    return cveId && matchingCVEs.has(cveId);
+                });
+            } else {
+                // Mode ET (par défaut) : les CVE doivent correspondre à TOUS les filtres
+                this.activeFilters.search.forEach(filter => {
+                    filtered = searchCVEs(filtered, filter.value);
+                });
+            }
         } else if (this.currentFilters.search) {
             // Fallback pour compatibilité
             filtered = searchCVEs(filtered, this.currentFilters.search);
@@ -454,6 +484,21 @@ const APP = {
         
         container.style.display = 'block';
         badgesContainer.innerHTML = '';
+        
+        // Afficher/masquer la case à cocher ET/OU selon le nombre de filtres de recherche
+        const searchModeToggle = document.getElementById('searchModeToggle');
+        if (searchModeToggle) {
+            if (this.activeFilters.search.length > 1) {
+                searchModeToggle.style.display = 'flex';
+                // Mettre à jour l'état de la case à cocher
+                const checkbox = document.getElementById('searchModeCheckbox');
+                if (checkbox) {
+                    checkbox.checked = this.searchMode === 'OR';
+                }
+            } else {
+                searchModeToggle.style.display = 'none';
+            }
+        }
         
         // Rendre chaque filtre actif
         Object.entries(this.activeFilters).forEach(([type, filters]) => {

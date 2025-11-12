@@ -14,7 +14,20 @@
         </div>
     </header>
 
-    <main class="container">
+    <div class="main-wrapper">
+        <!-- Sidebar des filtres prédéfinis -->
+        <aside class="sidebar" id="predefinedFiltersSidebar">
+            <div class="sidebar-header">
+                <h2>Filtres prédéfinis</h2>
+                <button class="btn-add-filter" id="addFilterBtn" title="Ajouter un filtre">+</button>
+            </div>
+            <div class="predefined-filters-list" id="predefinedFiltersList">
+                <!-- Les filtres seront générés dynamiquement -->
+            </div>
+        </aside>
+
+        <!-- Contenu principal -->
+        <main class="container main-content">
         <!-- Barre de recherche et filtres -->
         <section class="search-section">
             <div class="search-bar">
@@ -24,7 +37,13 @@
 
             <!-- Zone des filtres actifs -->
             <div id="activeFilters" class="active-filters" style="display: none;">
-                <span class="active-filters-label">Filtres actifs:</span>
+                <div class="active-filters-header">
+                    <span class="active-filters-label">Filtres actifs:</span>
+                    <label class="search-mode-toggle" id="searchModeToggle" style="display: none;">
+                        <input type="checkbox" id="searchModeCheckbox">
+                        <span class="search-mode-label">Mode OU (sinon ET)</span>
+                    </label>
+                </div>
                 <div class="filter-badges" id="filterBadges">
                     <!-- Les badges seront générés dynamiquement -->
                 </div>
@@ -107,7 +126,8 @@
                 <!-- Générée dynamiquement -->
             </div>
         </section>
-    </main>
+        </main>
+    </div>
 
     <!-- Modal de détails CVE -->
     <div id="cveModal" class="modal">
@@ -124,6 +144,7 @@
     <script src="js/db.js"></script>
     <script src="js/cveLoader.js"></script>
     <script src="js/cveRenderer.js"></script>
+    <script src="js/predefinedFilters.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
