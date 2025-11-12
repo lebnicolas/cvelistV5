@@ -19,17 +19,27 @@ chmod +x update-database.sh
 
 Si vous préférez faire les étapes manuellement :
 
-1. **Éteindre l'application CVE**
+1. **Récupérer les modifications depuis le dépôt Git original**
+   ```sh
+   git fetch upstream
+      ```
+   
+   > 💡 **Note :** Si vous n'avez pas encore configuré le remote `upstream`, ajoutez-le avec :
+   > ```sh
+   > git remote add upstream https://github.com/CVEProject/cvelistV5/tree/main
+   > ```
+
+2. **Éteindre l'application CVE**
    ```sh
    # Arrêter l'application si elle est en cours d'exécution
    ```
 
-2. **Importer les nouvelles données**
+3. **Importer les nouvelles données dans SQLite**
    ```sh
    npm run import
    ```
 
-3. **Redémarrer l'application CVE**
+4. **Redémarrer l'application CVE**
    ```sh
    node server.js 8080
    ```
