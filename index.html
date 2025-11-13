@@ -15,7 +15,7 @@
     </header>
 
     <div class="main-wrapper">
-        <!-- Sidebar des filtres prédéfinis -->
+        <!-- Sidebar des filtres prédéfinis et destinataires -->
         <aside class="sidebar" id="predefinedFiltersSidebar">
             <div class="sidebar-header">
                 <h2>Filtres prédéfinis</h2>
@@ -23,6 +23,19 @@
             </div>
             <div class="predefined-filters-list" id="predefinedFiltersList">
                 <!-- Les filtres seront générés dynamiquement -->
+            </div>
+            
+            <div class="sidebar-section-divider"></div>
+            
+            <div class="sidebar-header">
+                <h2>Destinataires email</h2>
+                <button class="btn-add-filter" id="addRecipientBtn" title="Ajouter un destinataire">+</button>
+            </div>
+            <div class="email-recipients-list" id="emailRecipientsList">
+                <!-- Les destinataires seront générés dynamiquement -->
+            </div>
+            <div class="send-email-section">
+                <button class="btn-send-email" id="sendEmailBtn" title="Envoyer l'email avec les nouvelles CVE">📧 Envoyer l'email</button>
             </div>
         </aside>
 
@@ -145,6 +158,7 @@
     <script src="js/cveLoader.js"></script>
     <script src="js/cveRenderer.js"></script>
     <script src="js/predefinedFilters.js"></script>
+    <script src="js/emailRecipients.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
