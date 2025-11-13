@@ -3,4 +3,6 @@ cves/2025/index.json
 cves.db
 node_modules
 data/predefined-filters.json
+data/email-recipients.json
+data/sent-cves.json
 cves
